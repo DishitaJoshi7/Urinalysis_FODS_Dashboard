@@ -1,18 +1,21 @@
 """Run with: python -m streamlit run app.py (see README for VS Code setup)."""
 import streamlit as st
 from core import DATA_PATH
-from ui import load_data
+from diabetes_ui import get_data, source_version
 
 # Native navigation runs only the active page, avoiding computation in hidden tabs.
-st.set_page_config(page_title='Urinalysis Lab | FODS', page_icon=':material/science:', layout='wide')
+st.set_page_config(page_title='Diabetes Analyzer | NHANES', page_icon=':material/monitor_heart:', layout='wide')
 page = st.navigation({
     'Dashboard': [
         st.Page('app_pages/overview.py', title='Overview', icon=':material/dashboard:'),
         st.Page('app_pages/explorer.py', title='Data explorer', icon=':material/table_chart:')],
+    'Diabetes models': [
+        st.Page('app_pages/classification.py', title='Model performance', icon=':material/model_training:'),
+        st.Page('app_pages/profile.py', title='Research profile score', icon=':material/analytics:')],
     'Analysis': [
         st.Page('app_pages/statistics.py', title='Descriptive statistics', icon=':material/functions:'),
         st.Page('app_pages/correlation.py', title='Correlation', icon=':material/scatter_plot:'),
-        st.Page('app_pages/regression.py', title='Regression & imputation', icon=':material/model_training:'),
+        st.Page('app_pages/regression.py', title='CBC regression', icon=':material/functions:'),
         st.Page('app_pages/transforms.py', title='Normalization & clustering', icon=':material/tune:'),
         st.Page('app_pages/gallery.py', title='Visualizations', icon=':material/bar_chart:')],
     'Project': [
@@ -22,30 +25,32 @@ page = st.navigation({
 
 # Cache the original tables; interactive selection never modifies source records.
 try:
-    sheets, labels = load_data(DATA_PATH.stat().st_mtime)
+    data = get_data(source_version())
 except (FileNotFoundError, ValueError) as error:
-    st.error(f'Cannot load the supplied workbook: {error}')
+    st.error(f'Cannot load the required dataset: {error}. See README for the included source files.')
     st.stop()
-full = sheets['Merged_Dataset']
+full = data['eligible']
+sheets, labels = data['sheets'], data['labels']
 with st.sidebar:
     st.divider()
-    st.markdown('**URINALYSIS LAB**')
+    st.markdown('**DIABETES ANALYZER**')
     st.caption('Fundamentals of Data Science · NHANES 2017–2018')
-    cohort = st.selectbox('Analysis cohort', ['All matched respondents', 'Observed urine panel',
-        'Complete blood panel', 'Complete urine + blood panels'], key='cohort_choice')
-    if cohort == 'Observed urine panel':
-        df = full.dropna(subset=['URXUMA','URXUCR','URDACT'])
-    elif cohort == 'Complete blood panel':
-        df = full.dropna(subset=[c for c in full if c.startswith(('LBX','LBD'))])
-    elif cohort == 'Complete urine + blood panels':
-        df = full.dropna()
-    else:
-        df = full
-    st.caption(f'{len(df):,} of {len(full):,} respondents selected')
-    st.caption('All summaries are unweighted. Missing values remain missing.')
+    status = st.selectbox('Reported status', ['All eligible adults','Reported diabetes','No reported diabetes'],key='status_filter')
+    age = st.slider('Age range (80 = 80+)',20,80,(20,80),key='age_filter')
+    df = full.loc[full.RIDAGEYR.between(*age)].copy()
+    if status != 'All eligible adults':
+        df = df.loc[df.STATUS.eq(status)]
+    st.caption(f'{len(df):,} of {len(full):,} eligible adults selected')
+    st.caption('Filters affect descriptive views. Model evaluation uses the fixed full cohort.')
+    st.caption('Unweighted sample. Outcome: self-reported doctor-told diabetes.')
 
 # Store the selected cohort once so each page uses the same denominator.
-st.session_state.update(cohort=df, labels=labels, sheets=sheets)
-st.caption('FODS PROJECT / NHANES 2017–2018')
+# Existing laboratory analyses receive only original workbook columns; no labels enter their calculations.
+st.session_state.update(cohort=df[sheets['Merged_Dataset'].columns], diabetes_cohort=df,
+                       labels=labels, sheets=sheets, diabetes_data=data)
+st.caption('DIABETES ANALYZER / NHANES 2017–2018')
 st.title(page.title.split(' · ')[-1])
+if df.empty:
+    st.info('No respondents match these filters. Expand the age range or select all eligible adults.')
+    st.stop()
 page.run()

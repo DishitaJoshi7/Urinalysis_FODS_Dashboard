@@ -8,7 +8,7 @@ from streamlit.testing.v1 import AppTest
 APP=Path(__file__).resolve().parents[1]/'app.py'
 
 
-@pytest.mark.parametrize('page',['overview','explorer','statistics','correlation','regression','transforms','gallery','toolkit','methodology'])
+@pytest.mark.parametrize('page',['overview','explorer','classification','profile','statistics','correlation','regression','transforms','gallery','toolkit','methodology'])
 def test_pages_render(page):
     at=AppTest.from_file(str(APP),default_timeout=90).run()
     if page!='overview':
@@ -18,9 +18,9 @@ def test_pages_render(page):
 
 def test_cohort_and_regression_change():
     at=AppTest.from_file(str(APP),default_timeout=90).run()
-    at.selectbox(key='cohort_choice').set_value('Complete urine + blood panels').run()
+    at.selectbox(key='status_filter').set_value('Reported diabetes').run()
     assert not at.exception
-    assert int(at.metric[0].value.replace(',',''))<7936
+    assert int(at.metric[0].value.replace(',',''))==836
     at.switch_page('app_pages/regression.py').run()
     at.session_state['regression_mode']='Multiple linear'
     at.run()
@@ -38,3 +38,15 @@ def test_binning_alternatives_and_gallery():
     at.switch_page('app_pages/gallery.py').run()
     at.selectbox[1].set_value('ECDF').run()
     assert not at.exception
+
+
+def test_profile_and_fixed_classification_cohort():
+    at=AppTest.from_file(str(APP),default_timeout=90).run()
+    at.selectbox(key='status_filter').set_value('Reported diabetes').run()
+    at.switch_page('app_pages/classification.py').run()
+    assert not at.exception
+    assert at.metric[0].value=='0.820'
+    at.switch_page('app_pages/profile.py').run()
+    at.button[0].click().run()
+    assert not at.exception
+    assert at.metric[0].label=='Model score for reported-diabetes class'

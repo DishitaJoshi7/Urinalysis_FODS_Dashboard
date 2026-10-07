@@ -1,44 +1,32 @@
-## Common dataset and evaluation
+# Diabetes classification in RapidMiner and Weka
 
-`exports/train.csv` / `train.arff` contain training records; the matching test files contain the exact Python holdout. Both have two numeric columns: `LBXHGB` predictor and `LBXHCT` target. IDs are stored separately for auditing and must not be joined back as predictors. The target is the last attribute. Seed 42 and an 80/20 split are fixed in `prepare_exports.py`.
+## Shared evaluation files
 
-`exports/python_metrics.csv` records the actual Python benchmark. Compare MAE and RMSE across tools. Their default feature-selection and regularization options can cause small differences; configure ordinary least squares where possible. Weka's reported correlation coefficient is not the same statistic as sklearn's coefficient of determination (R²).
+Use exports/diabetes/, not the older root-level CBC regression files. The train/validation/test files have the same rows as Python's stratified 60/20/20 split. IDs are separate. The class is DIABETES_REPORTED with nominal values no and yes (yes is positive). Tool-ready data uses medians fitted on train only; raw files retain missing values. Both classes remain in every split.
+
+These exports enable additional tool comparisons; they do not reproduce Python's missing-indicator features, class weights or exact model implementation. Native-tool performance is currently unmeasured. Do not present Python results as Weka/RapidMiner results.
 
 ## RapidMiner / Altair AI Studio
 
-1. Install/open your course's RapidMiner/AI Studio version.
-2. Import `tools/rapidminer_regression.rmp` using **File → Import Process**, or paste its XML into the XML view.
-3. In the two **Read CSV** operators, set absolute paths to `exports/train.csv` and `exports/test.csv`. Relative paths in the template assume the project folder is the working directory. The first row is a header, separator is comma, decimal separator is a period, both attributes numeric.
-4. Each input feeds **Set Role**, with attribute `LBXHCT` and role `label`.
-5. Training data feeds **Linear Regression**. Set feature selection to none and ridge to zero; names/options can vary by installed version.
-6. Connect the model to **Apply Model** and test data to its unlabeled input. Its labeled output goes to **Performance (Regression)**; enable root mean squared error and absolute error.
-7. Run, record the performance output and save your process/screenshots for the course submission.
+1. Import tools/rapidminer_diabetes.rmp. In both Read CSV operators, set absolute paths to exports/diabetes/train.csv and test.csv.
+2. Confirm numerical predictors and a nominal DIABETES_REPORTED column. Both Set Role operators assign it the label role.
+3. The template fits a Decision Tree on training rows, applies it to the test rows, and measures binominal classification performance. This is a separate comparator, not a replica of the Python forest.
+4. Check that the positive class is yes. Record confusion counts, precision, recall, F1 and ROC AUC where supported by your version.
+5. If tuning any parameters or threshold, apply the candidate model to validation.csv first. Freeze settings, then evaluate test.csv once. Do not choose settings based on test performance.
+6. Save measured outputs/screenshots and your final process. If template compatibility differs, recreate Read CSV → Set Role → Decision Tree → Apply Model → Performance (Binominal Classification) in the visual editor.
 
-If your version cannot import the template, recreate that operator chain in the visual editor. The supplied process is a starting workflow whose native execution has not been verified here. For a new split instead of the supplied pair, **Split Validation** separates training and testing subprocesses; use 80% training, shuffled sampling and a documented seed. Tool RNGs can differ, so use the supplied pair for exact row comparability. [Official Split Validation documentation](https://support.rapidminer.com/latest/studio/operators/validation/split_validation.html)
-
-For Experiment 6, import `cbc_exploration.csv`, select one measurement, handle its missing values, and try **Normalize**, **Discretize by Binning**, and **k-Means**. Fit transforms inside the training branch if evaluating a predictive model. Exploratory whole-cohort transformations are a separate exercise.
+[Official validation documentation](https://support.rapidminer.com/latest/studio/operators/validation/split_validation.html)
 
 ## Weka Explorer
 
-1. Launch Explorer and open `exports/train.arff` in **Preprocess**.
-2. Confirm both attributes are numeric. Set the class/target to `LBXHCT`.
-3. In **Classify**, select `functions → LinearRegression`.
-4. Configure attribute selection as **No attribute selection**, ridge `0`, and keep the single predictor. In the CLI these are `-S 1 -R 0`.
-5. Select **Supplied test set**, choose `exports/test.arff`, and press **Start**.
-6. Record MAE and RMSE alongside the Python results. Save result text/model from the result list if your submission needs it.
+1. Open exports/diabetes/train.arff in Preprocess. Set the last attribute DIABETES_REPORTED as class; it must display nominal no/yes, not numeric.
+2. In Classify choose functions → Logistic. The supplied files already contain training-median imputation, so do not fit preprocessing on the combined dataset.
+3. Choose Supplied test set. Use validation.arff for model development and test.arff only after freezing the settings.
+4. Run and save the classifier output, confusion matrix and per-class metrics for yes. Weka's default decision rule may differ from the Python validation-selected threshold; state that in comparisons.
+5. A command-line evaluation is provided in tools/run_weka_diabetes.cmd; pass the installed weka.jar path. It evaluates a default Logistic comparator and saves actual output only after success.
 
-The ARFF files have identical attribute schemas, and the missing-value encoding is `?`. The numeric target means this is regression, even though Weka's tab is called Classify. [Official Weka Explorer guide](https://weka.sourceforge.net/manuals/ExplorerGuide.pdf)
+[Official Weka Explorer guide](https://weka.sourceforge.net/manuals/ExplorerGuide.pdf)
 
-Command-line equivalent (requires Java and your installed `weka.jar`):
+## What remains to complete
 
-```powershell
-java -cp "C:\path\to\weka.jar" weka.classifiers.functions.LinearRegression -t exports/train.arff -T exports/test.arff -c last -S 1 -R 0
-```
-
-Or run `tools\run_weka.cmd "C:\path\to\weka.jar"`. It writes `exports/weka_results.txt` only after successful execution.
-
-For exploration, open `cbc_exploration.arff`, select an attribute and use **Visualize All** for the scatter matrix. In Preprocess, filters under **unsupervised → attribute** include Normalize, Standardize and Discretize. Weka Standardize uses its own convention; this app's teaching z-score explicitly uses sample SD. In Cluster, apply SimpleKMeans with k=3 and seed 42 to a single selected measurement after handling missingness. Treat cluster labels as arbitrary and compare sorted centroids.
-
-## Execution status
-
-Python calculations, exports and dashboard pages were tested in this workspace; see `VALIDATION.md`. RapidMiner and Weka desktop sessions were not run. Do not report external-tool performance until you execute the provided workflows. No installation or licensing is implied by this project bundle.
+Both native tools must be run locally; neither was executed by this project build. Their installations/licenses are not bundled. Add measured native-tool results to the README only after execution. The older tools/rapidminer_regression.rmp and tools/run_weka.cmd remain for the supplementary hematocrit regression and are not diabetes classifiers.

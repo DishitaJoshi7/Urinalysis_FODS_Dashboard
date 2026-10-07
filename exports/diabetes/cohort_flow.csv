@@ -1,0 +1,9 @@
+Cohort step,Records
+Original matched laboratory respondents,7936
+Excluded: age below 20 or unavailable,2671
+Adults aged 20+,5265
+Excluded adults: borderline response,163
+Excluded adults: refused / unknown / missing response,4
+Eligible adults with yes/no response,5098
+Reported diabetes,836
+No reported diabetes,4262

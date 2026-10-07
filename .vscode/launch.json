@@ -1,7 +1,7 @@
 {
   "version": "0.2.0",
   "configurations": [{
-    "name": "Run FODS dashboard",
+    "name": "Run diabetes dashboard",
     "type": "debugpy",
     "request": "launch",
     "module": "streamlit",

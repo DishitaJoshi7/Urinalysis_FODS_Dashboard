@@ -1,40 +1,32 @@
-"""Export the same records for reproducible comparisons across course tools."""
+"""Expose classification exports with nominal labels and the actual Python benchmark."""
 from io import BytesIO
-from zipfile import ZipFile, ZIP_DEFLATED
+from zipfile import ZipFile,ZIP_DEFLATED
+import pandas as pd
 import streamlit as st
-from core import regression_experiment, arff_text, ROOT
-from ui import context, table
+from core import ROOT
+from ui import table
 
-df,labels=context()
-st.markdown('Use the same training and test records in Python, RapidMiner, and Weka.')
-st.caption('Exports follow the selected sidebar cohort. The packaged exports/ folder contains the default full cohort.')
-features=['LBXHGB']
-result=regression_experiment(df,features)
-target='LBXHCT'
-
-# SEQN is deliberately omitted from model matrices; it is saved in a separate audit file.
+st.markdown('Download the fixed adult diabetes cohort splits for Python, RapidMiner and Weka.')
+st.caption('These files use the full fixed cohort. Sidebar descriptive filters do not change the training/test records.')
+folder=ROOT/'exports'/'diabetes'
+if not (folder/'benchmark.json').exists():
+    st.error('Run python prepare_diabetes.py to generate the classification exports.')
+    st.stop()
 buffer=BytesIO()
 with ZipFile(buffer,'w',ZIP_DEFLATED) as archive:
-    for split in ['train','test']:
-        matrix=result[split][features+[target]]
-        archive.writestr(f'{split}.csv',matrix.to_csv(index=False))
-        archive.writestr(f'{split}.arff',arff_text(matrix))
-        archive.writestr(f'{split}_ids.csv',result[split][['SEQN']].to_csv(index=False))
-    archive.writestr('python_metrics.csv',result['metrics'].to_csv(index=False))
-    archive.writestr('README.txt','Simple linear regression: LBXHGB -> LBXHCT.\n'
-        '80% train / 20% test, random_state=42. Target is last.\n'
-        'Do not add IDs to the model. Import train and test separately.\n'
-        'Python R2 is not the same as Weka correlation coefficient.\n')
-st.download_button('Download CSV + ARFF comparison bundle',buffer.getvalue(),
-                   'course_tool_exports.zip','application/zip',icon=':material/download:')
-table(result['metrics'].round(4),'Python reference metrics for tool comparison')
-
+    for path in sorted(folder.iterdir()):
+        if path.is_file(): archive.write(path,path.name)
+st.download_button('Download diabetes analysis bundle',buffer.getvalue(),
+    'diabetes_analysis_exports.zip','application/zip',icon=':material/download:')
+table(pd.read_csv(folder/'test_metrics.csv').round(4),'Recorded Python test metrics')
 st.subheader('Export specification')
-st.markdown('**Predictor:** hemoglobin (LBXHGB). **Target:** hematocrit (LBXHCT). '
-    '**Split:** 80% training / 20% test, random seed 42. '
-    'CSV and ARFF files contain identical records; respondent IDs are provided separately for auditing.')
-st.caption('These exports support RapidMiner and Weka. External-tool results have not been measured. '
-           'The table above reports the verified Python benchmark.')
-st.download_button('Download integration documentation',
+st.markdown('Ten numerical predictors and a **yes/no nominal outcome**. CSV and ARFF share '
+    'the same training, validation and test rows. Missing predictors in tool-ready files use '
+    'training medians only. Raw variants retain missing values; IDs are in separate audit files.')
+st.caption('Python pipelines additionally use missing indicators and class weighting. External-tool '
+    'settings and scores may differ. The old root-level exports belong to the supplementary CBC regression.')
+st.info('RapidMiner and Weka files are prepared. Neither tool has been executed for the diabetes task; '
+    'the table reports Python results only.')
+st.download_button('Download tool integration instructions',
     (ROOT/'docs'/'RAPIDMINER_WEKA.md').read_text(encoding='utf-8'),
     'RAPIDMINER_WEKA.md','text/markdown')

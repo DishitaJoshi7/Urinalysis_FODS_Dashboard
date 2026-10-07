@@ -1,37 +1,25 @@
 # Validation results
 
-Validated on 7 October 2026 using Python 3.12 and the versions pinned in requirements.txt.
+Validated on 8 October 2026 using Python 3.12 and the pinned project dependencies.
 
-## Passed
+## Completed checks
 
-- Full automated suite: **20 tests passed**. All nine dashboard pages completed without application exceptions.
-- After the final Matplotlib orientation update: **10 targeted tests passed**, covering the core calculations and gallery rendering.
-- Source merged table: **7,936 rows × 29 columns**, unique nonmissing SEQN identifiers.
-- Reconstructed one-to-one urine/CBC join matches the supplied merged sheet, including missing values.
-- Observed urine ACR: **7,632**. Observed hemoglobin: **7,247**. Complete merged rows: **7,073**.
-- Manual correlation handles constant inputs, missing pairs, positive/negative relationships and agrees with an independent Pandas check.
-- Scaling retains missing values and handles constants. Binning includes all observed values and the range endpoints.
-- Train/test respondent IDs do not overlap. Eligible real imputation is tested on a controlled copy without altering the source.
-- ARFF round-trip parsing preserves numeric schema and missing values. RapidMiner XML parses successfully.
-- Cohort changes, simple/multiple regression switching, alternative discretization methods and ECDF selection are tested.
-- The six Matplotlib chart outputs were rendered and visually inspected for readable labels, legends and nonclipped content.
-- Streamlit server initialization succeeded, including loading the project theme.
+- **28 tests passed** across three runs: 5 diabetes data/model/export checks, 14 dashboard page/interaction checks, and 9 original laboratory calculation checks.
+- All 11 dashboard pages completed under Streamlit AppTest without application exceptions. Interactions covered status filtering, alternative binning, ECDF selection, multiple CBC regression, profile submission, and unchanged model evaluation when descriptive filters change.
+- The latest supplied workbook's merged table exactly matches the included workbook. Original laboratory columns and missing values are preserved in the enriched join.
+- Source table: 7,936 respondents. Eligible adult cohort: 5,098, comprising 836 reported-diabetes responses and 4,262 no-diagnosis responses. Borderline and unavailable responses are excluded.
+- Stratified train/validation/test membership has no overlapping respondent IDs. Imputer statistics are derived only from training observations. Model selection and threshold selection use validation data.
+- Exported nominal-class ARFF files parse successfully and preserve split membership. RapidMiner classification XML is syntactically valid.
+- Python compilation succeeded. The overview and model-performance figures were captured from the actual pages and visually inspected; see [chart gallery](diabetes_chart_gallery.png). The classification page was rerun after correcting the precision-recall plot's baseline representation.
 
-## Actual default Python benchmark
+## Measured held-out result
 
-Predictor: hemoglobin (LBXHGB). Target: hematocrit (LBXHCT). Seed 42; 5,797 training and 1,450 held-out rows.
+Validation selected the lab-plus-demographics random forest. On 1,020 held-out test respondents at its frozen 0.46 threshold: ROC AUC 0.8201, average precision 0.4879, precision 0.3283, recall 0.7844, and F1 0.4629. Confusion counts are TN 585, FP 268, FN 36, TP 131. These are reproducible sample classification results, not clinical validation. Detailed metrics and provenance are in `exports/diabetes/`.
 
-| Model | MAE | RMSE | R² |
-|---|---:|---:|---:|
-| Linear regression | 0.7910 | 0.9972 | 0.9453 |
-| Training-mean baseline | 3.3524 | 4.2660 | -0.0015 |
+## Validation limits
 
-MAE/RMSE are hematocrit percentage points. These are sample holdout results, not clinical validation. Of 689 missing hematocrit values, zero have observed hemoglobin, so the simple model cannot fill them from the supplied predictors.
-
-## Limitations of validation
-
-- In-app browser automation failed with a Windows sandbox initialization error. An alternative headless browser also exited during startup; full browser layout/responsiveness was not verified. Streamlit's AppTest ran successfully, and charts were independently rendered and inspected.
-- Localhost access across tool sessions did not succeed, so a durable live preview is not included. Run the supplied launcher on your machine.
-- The full suite emitted third-party Seaborn/Matplotlib deprecation warnings and a Windows temporary-folder cleanup warning after tests passed. The targeted rerun used a project-local temporary directory and completed cleanly.
-- RapidMiner and Weka were not executed. XML syntax and ARFF format were checked; native-tool import/compatibility and performance require the installed desktop tools. The included workflow guide explicitly records this status.
-- This project does not claim hardware, camera calibration, hospital integration, clinical safety, or regulatory validation.
+- RapidMiner and Weka were not executed. Their workflow templates and exchange formats are prepared; native import compatibility and external-tool metrics remain unverified.
+- AppTest and rendered figures were checked. Full browser layout, responsiveness and browser interactions were not verified; browser automation was unavailable in this Windows environment.
+- Tests emitted third-party Seaborn/Matplotlib deprecation warnings; these did not cause failures.
+- No external or prospective model validation was performed. The target is self-reported doctor-told diabetes status; the model is not a diagnosis, future-risk forecast, or validated personal probability.
+- No urine-strip hardware, RGB calibration, hospital integration or population prevalence claims are validated by this project.

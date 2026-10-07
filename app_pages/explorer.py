@@ -1,48 +1,37 @@
-"""Experiments 1 and 2: Pandas inspection, filtering, joins, cleaning, NumPy."""
-import io
-import numpy as np
+"""Inspect the original laboratory fields, added CDC variables, and cohort construction."""
 import pandas as pd
 import streamlit as st
-from core import measurement_columns
-from ui import context, table, csv_button
+from diabetes import FEATURES,TARGET
+from charts import missingness
+from ui import table,plot,csv_button
 
-df, labels = context()
-st.caption('DATA EXPLORATION · Measurement coverage and quality')
-cols = st.multiselect('Columns to explore', list(df.columns),
-                     default=['SEQN','URXUMA','URXUCR','URDACT','LBXHGB','LBXHCT'])
-field = st.selectbox('Filter measurement', measurement_columns(df), index=2)
-observed = df[field].dropna()
-low, high = st.slider('Keep values in this range', float(observed.min()), float(observed.max()),
-                      (float(observed.min()), float(observed.max())))
-include_missing = st.checkbox('Include missing values for this measurement', value=True)
-mask = df[field].between(low,high) | (df[field].isna() if include_missing else False)
-view = df.loc[mask, cols]
-st.caption(f'{len(view):,} records after explorer filters. Other pages use the sidebar cohort only.')
-table(view, 'Filtered respondent measurements', height=350)
-csv_button(view, 'Download filtered CSV', 'filtered_data')
+df=st.session_state.diabetes_cohort
+labels=st.session_state.labels
+st.caption('DATA EXPLORATION · Original urine/CBC measurements joined to matching 2017–2018 CDC records')
+default=['SEQN','STATUS','RIDAGEYR','BMXBMI','URDACT','LBXHGB']
+cols=st.multiselect('Displayed columns',df.columns.tolist(),default=default)
+if cols:
+    table(df[cols],'Selected adult respondent records',height=350)
+    csv_button(df[cols],'Download selected records','diabetes_selected_records')
+plot(missingness(df[FEATURES]),'Missing predictor measurements in selected cohort','diabetes_missingness')
 
-# Profile keeps counts and units next to each variable rather than guessing types.
-with st.expander('Data dictionary and missing-value audit', expanded=True):
-    profile = pd.DataFrame({'Code': df.columns, 'Definition / unit': [labels[c] for c in df],
-        'Type': [str(df[c].dtype) for c in df], 'Observed':df.notna().sum().values,
-        'Missing':df.isna().sum().values, 'Missing %':df.isna().mean().mul(100).round(2).values})
-    table(profile, 'Variable definitions, types, and missing counts')
-    st.caption('URDUMALC and URDUCRLC are detection-limit flags, not analyte concentrations. '
-               'URXUMS and URXCRS repeat measurements in alternative units.')
-
-with st.expander('Source table reconciliation'):
-    sheets = st.session_state.sheets
-    rebuilt = sheets['Urine_Albumin_Creatinine'].merge(sheets['Complete_Blood_Count'], on='SEQN',
-                how='inner', validate='one_to_one')
-    st.write(f'Urine table: {len(sheets["Urine_Albumin_Creatinine"]):,} rows. '
-             f'CBC table: {len(sheets["Complete_Blood_Count"]):,} rows. '
-             f'One-to-one inner join: {len(rebuilt):,} rows.')
-with st.expander('Compare cleaning choices without changing the original data'):
-    choice = st.selectbox('Missing-value treatment', ['Keep missing', 'Drop missing', 'Mean fill', 'Median fill'])
-    s = df[field].copy()
-    changed = s.dropna() if choice == 'Drop missing' else s.fillna(s.mean()) if choice == 'Mean fill' else s.fillna(s.median()) if choice == 'Median fill' else s
-    table(pd.DataFrame({'Method':['Original',choice], 'Rows':[len(s),len(changed)],
-        'Missing':[s.isna().sum(),changed.isna().sum()], 'Mean':[s.mean(),changed.mean()],
-        'Sample SD':[s.std(),changed.std()]}), 'Effect of missing-value treatment')
-    st.caption('Mean/median filling can reduce variance. These comparisons are descriptive; predictive preprocessing must be fit on training data only.')
-
+with st.expander('Data dictionary and missing-value audit',expanded=True):
+    profile=pd.DataFrame({'Code':df.columns,'Definition / unit':[labels.get(c,c) for c in df],
+        'Observed':df.notna().sum().values,'Missing':df.isna().sum().values,
+        'Missing %':df.isna().mean().mul(100).round(2).values})
+    table(profile,'Joined variable definitions and missing counts')
+with st.expander('Source matching and inclusion criteria',expanded=True):
+    data=st.session_state.diabetes_data
+    table(data['join_audit'],'CDC source matching by respondent ID')
+    table(data['flow'],'Cohort inclusion and exclusion counts')
+    st.caption('These counts describe the full source cohort before sidebar filters. '
+        'Borderline, refused, unknown and missing answers are excluded from binary classification.')
+with st.expander('Compare missing-value treatments'):
+    field=st.selectbox('Measurement for treatment comparison',FEATURES,format_func=lambda c:labels[c])
+    method=st.selectbox('Treatment',['Keep missing','Drop missing','Mean fill','Median fill'])
+    s=df[field]
+    changed=s.dropna() if method=='Drop missing' else s.fillna(s.mean()) if method=='Mean fill' else s.fillna(s.median()) if method=='Median fill' else s
+    table(pd.DataFrame({'Method':['Original',method],'Rows':[len(s),len(changed)],
+        'Missing':[s.isna().sum(),changed.isna().sum()],'Mean':[s.mean(),changed.mean()],
+        'Sample SD':[s.std(),changed.std()]}),'Descriptive effect of missing-value treatment')
+    st.caption('This comparison does not modify source data or model inputs. The model learns imputation values from training rows only.')

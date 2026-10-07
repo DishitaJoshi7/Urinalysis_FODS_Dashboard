@@ -1,37 +1,53 @@
-"""A quick introduction to the cohort and its measurement coverage."""
+"""Diabetes cohort overview with clearly defined outcomes and descriptive comparisons."""
+import pandas as pd
+import numpy as np
 import streamlit as st
-from core import measurement_columns
-from charts import distribution, missingness
-from ui import context, plot, table
+from diabetes import TARGET,FEATURES
+from charts import canvas,sns,TEAL,CORAL,PALETTE
+from ui import plot,table,csv_button
 
-df, labels = context()
-st.markdown('Explore urine chemistry and blood-count measurements, evaluate their statistical relationships.')
+df=st.session_state.diabetes_cohort
+labels=st.session_state.labels
+st.markdown('Explore how urine chemistry, blood counts and participant characteristics relate to **reported diabetes status**.')
+st.caption('Adults aged 20+ with a yes/no response to the doctor-told diabetes question. “No reported diabetes” does not establish absence of disease.')
 with st.container(horizontal=True):
-    st.metric('Respondents', f'{len(df):,}', border=True)
-    st.metric('Urine ACR observed', f'{df.URDACT.notna().sum():,}', border=True)
-    st.metric('Hemoglobin observed', f'{df.LBXHGB.notna().sum():,}', border=True)
-    st.metric('Median ACR · mg/g', f'{df.URDACT.median():.2f}', border=True)
+    st.metric('Eligible adults selected',f'{len(df):,}',border=True)
+    st.metric('Reported diabetes',f'{int(df[TARGET].sum()):,}',border=True)
+    st.metric('Reported share · sample',f'{df[TARGET].mean():.1%}',border=True)
+    st.metric('Median urine ACR · mg/g',f'{df.URDACT.median():.2f}',border=True)
 
-# Two prominent charts establish distribution shape and data quality first.
-left, right = st.columns([1.15, 1])
-with left, st.container(border=True):
-    st.subheader('Urine albumin / creatinine')
-    st.caption('Observed values on a log scale to make the long right tail visible.')
-    plot(distribution(df.URDACT, 'ACR (mg/g)', log=True), 'Distribution of urine ACR', 'overview_acr')
-with right, st.container(border=True):
-    st.subheader('Where measurements are missing')
-    st.caption('The twelve variables with the largest missing fractions.')
-    plot(missingness(df), 'Missing measurements by variable', 'overview_missing')
+# Keep categorical response counts and laboratory distributions visually distinct.
+left,right=st.columns(2)
+with left,st.container(border=True):
+    st.subheader('Reported status in the selected sample')
+    counts=df.STATUS.value_counts().reindex(['No reported diabetes','Reported diabetes'],fill_value=0)
+    fig,ax=canvas(7,4)
+    bars=ax.bar(['No reported\ndiabetes','Reported\ndiabetes'],counts.values,color=[TEAL,CORAL])
+    ax.bar_label(bars,fmt='%d',padding=4)
+    ax.set(ylabel='Respondents',ylim=(0,max(counts.max()*1.15,1)))
+    plot(fig,'Counts of reported diabetes responses','diabetes_status')
+    st.caption('This is an unweighted sample proportion, not a national prevalence estimate.')
+with right,st.container(border=True):
+    st.subheader('Urine ACR by reported status')
+    chart=df[['URDACT','STATUS']].dropna().copy()
+    chart['Log ACR']=np.log10(1+chart.URDACT)
+    fig,ax=canvas(7,4)
+    for group,color in zip(['No reported diabetes','Reported diabetes'],[TEAL,CORAL]):
+        values=chart.loc[chart.STATUS.eq(group),'Log ACR']
+        if len(values): sns.ecdfplot(values,ax=ax,label=f'{group} (n={len(values):,})',color=color)
+    ax.set(xlabel='log10(1 + urine ACR in mg/g)',ylabel='Cumulative fraction')
+    ax.legend(frameon=False,fontsize=8)
+    plot(fig,'Urine ACR cumulative distributions by reported status','diabetes_acr')
+    st.caption('Group differences are descriptive associations; they do not establish causation.')
 
-with st.container(border=True):
-    st.subheader('From laboratory data to a strip-reader use case')
-    st.markdown('**This project covers the data science layer:** inspect → clean → visualize → correlate → estimate → evaluate. '
-        'The supplied workbook contains urine chemistry and CBC results. RGB pad readings, strip images, '
-        'calibration pairs, and repeat-visit timestamps are unavailable.')
-    st.caption('Blood leukocyte counts are not urinary leukocyte-pad results. Urine albumin is not a direct calibration of a total-protein strip pad. '
-               'This dashboard does not provide diagnoses or validated strip-reader predictions.')
-
-st.subheader('Measurement snapshot')
-cols = ['URXUMA','URXUCR','URDACT','LBXWBCSI','LBXHGB','LBXHCT']
-table(df[['SEQN']+cols].head(12), 'First twelve selected respondents')
-st.caption('Variable definitions and units are available in Data explorer. Source: supplied NHANES workbook, Merged_Dataset.')
+st.subheader('Participant and laboratory comparison')
+field=st.selectbox('Compare measurement',['RIDAGEYR','BMXBMI','URDACT','URXUCR','LBXWBCSI','LBXHGB'],format_func=lambda c:labels[c])
+comparison=df.groupby('STATUS')[field].agg(['count','median','mean','std']).reset_index()
+table(comparison.round(3),'Observed measurements by reported diabetes group')
+fig,ax=canvas(10,3.5)
+sns.boxplot(data=df,x=field,y='STATUS',ax=ax,color='#b9ddd6',fliersize=2)
+ax.set(xlabel=labels[field],ylabel='')
+plot(fig,'Selected measurement distribution by reported diabetes status','group_comparison')
+csv_button(comparison,'Download group summary','diabetes_group_summary')
+st.info('Model performance compares demographics alone with models that also use your urine/CBC measurements. '
+        'It classifies reported current status; it does not forecast future diabetes or diagnose a person.')

@@ -1,0 +1,116 @@
+{
+  "task": "Classify self-reported doctor-told diabetes in adults aged 20+",
+  "label": "DIQ010: 1=yes, 2=no; all other responses excluded",
+  "features": [
+    "RIDAGEYR",
+    "SEX_FEMALE",
+    "BMXBMI",
+    "URDACT",
+    "URXUCR",
+    "LBXWBCSI",
+    "LBXHGB",
+    "LBXPLTSI",
+    "LBXRDW",
+    "LBXMCVSI"
+  ],
+  "seed": 42,
+  "split_rows": {
+    "train": 3058,
+    "validation": 1020,
+    "test": 1020
+  },
+  "split_positive_counts": {
+    "train": 502,
+    "validation": 167,
+    "test": 167
+  },
+  "winner": "Labs + demographics forest",
+  "selection": "Highest validation average precision",
+  "threshold_selection": "Maximum validation balanced accuracy over 0.05..0.95 in 0.01 increments",
+  "thresholds": {
+    "Class-prior baseline": 0.5,
+    "Demographics logistic": 0.4700000000000001,
+    "Labs + demographics logistic": 0.4600000000000001,
+    "Labs + demographics forest": 0.4600000000000001
+  },
+  "test_metrics": [
+    {
+      "Model": "Class-prior baseline",
+      "ROC AUC": 0.5,
+      "Average precision": 0.16372549019607843,
+      "Accuracy": 0.8362745098039216,
+      "Balanced accuracy": 0.5,
+      "Precision": 0.0,
+      "Recall": 0.0,
+      "F1": 0.0,
+      "Specificity": 1.0,
+      "Brier score": 0.13691964249132796,
+      "Threshold": 0.5,
+      "TN": 853,
+      "FP": 0,
+      "FN": 167,
+      "TP": 0
+    },
+    {
+      "Model": "Demographics logistic",
+      "ROC AUC": 0.7900857136840036,
+      "Average precision": 0.41215072925462426,
+      "Accuracy": 0.6676470588235294,
+      "Balanced accuracy": 0.7290542010937094,
+      "Precision": 0.3071748878923767,
+      "Recall": 0.8203592814371258,
+      "F1": 0.4469820554649266,
+      "Specificity": 0.6377491207502931,
+      "Brier score": 0.19548201131923734,
+      "Threshold": 0.4700000000000001,
+      "TN": 544,
+      "FP": 309,
+      "FN": 30,
+      "TP": 137
+    },
+    {
+      "Model": "Labs + demographics logistic",
+      "ROC AUC": 0.8037500614246302,
+      "Average precision": 0.43971984911481654,
+      "Accuracy": 0.6705882352941176,
+      "Balanced accuracy": 0.7259970094980028,
+      "Precision": 0.30751708428246016,
+      "Recall": 0.8083832335329342,
+      "F1": 0.44554455445544555,
+      "Specificity": 0.6436107854630715,
+      "Brier score": 0.18935251041764672,
+      "Threshold": 0.4600000000000001,
+      "TN": 549,
+      "FP": 304,
+      "FN": 32,
+      "TP": 135
+    },
+    {
+      "Model": "Labs + demographics forest",
+      "ROC AUC": 0.8200574232543121,
+      "Average precision": 0.487884550107736,
+      "Accuracy": 0.7019607843137254,
+      "Balanced accuracy": 0.7351229545598135,
+      "Precision": 0.3283208020050125,
+      "Recall": 0.7844311377245509,
+      "F1": 0.4628975265017668,
+      "Specificity": 0.6858147713950762,
+      "Brier score": 0.16232254423628292,
+      "Threshold": 0.4600000000000001,
+      "TN": 585,
+      "FP": 268,
+      "FN": 36,
+      "TP": 131
+    }
+  ],
+  "workbook_sha256": "8a2170f36607ec3fb926061dcc078650e9720e82abf15f9e0b0365fa0e56566f",
+  "external_tools": "Prepared only; RapidMiner and Weka have not been executed",
+  "population": "Unweighted analytic sample; not nationally representative prevalence",
+  "limitations": [
+    "Self-report is not confirmed disease",
+    "No future incidence outcome",
+    "Laboratory measurements may reflect existing disease or treatment",
+    "No external clinical validation",
+    "Model scores are not calibrated clinical probabilities"
+  ]
+}
