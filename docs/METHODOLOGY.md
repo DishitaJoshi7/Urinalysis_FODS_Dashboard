@@ -30,11 +30,11 @@ Hematocrit is the target. Simple regression uses hemoglobin; multiple regression
 
 The holdout can be understood as an artificial missing-target demonstration with known ground truth. Once evaluation is complete, a separate model fit on all complete cases estimates genuine missing targets only where every predictor is observed. Actual missing estimates are labeled and exported separately; they never overwrite the source. In the supplied default cohort, hematocrit and its predictors are missing together, so zero rows are eligible for the simple model. This is a real limitation, not a reason to invent filled values.
 
-CBC measurements are related biologically and sometimes algebraically. Strong held-out fits demonstrate the coursework algorithm, not clinical utility or strip-reader validity. Complete-case evaluation may be biased relative to participants with absent panels. Random holdout does not establish generalization across devices, batches, hospitals or populations.
+CBC measurements are related biologically and sometimes algebraically. Strong held-out fits describe relationships within the sample, not clinical utility or strip-reader validity. Complete-case evaluation may be biased relative to participants with absent panels. Random holdout does not establish generalization across devices, batches, hospitals or populations.
 
 ## Normalization and discretization
 
-Min-max scaling, sample z-scores, and decimal scaling are shown on the selected cohort for descriptive teaching. Constant series map to zero and NaNs remain NaNs. Decimal exponent is the smallest nonnegative integer that makes the largest absolute scaled value strictly less than one. For predictive pipelines these parameters must be learned on training rows only.
+Min-max scaling, sample z-scores, and decimal scaling are shown on the selected cohort for descriptive analysis. Constant series map to zero and NaNs remain NaNs. Decimal exponent is the smallest nonnegative integer that makes the largest absolute scaled value strictly less than one. For predictive pipelines these parameters must be learned on training rows only.
 
 K-means uses seed 42 and ten initializations; cluster IDs are sorted by centroid. Equal-width and equal-frequency alternatives demonstrate binning; quantile ties can reduce the effective bin count. Groups are statistical, not low/normal/high clinical diagnoses. Elbow curves are exploratory and do not guarantee an objectively correct k.
 

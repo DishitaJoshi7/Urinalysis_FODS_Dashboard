@@ -6,7 +6,7 @@ from charts import canvas, sns, TEAL
 from ui import context, table, plot, csv_button, explain
 
 df, labels = context()
-st.caption('EXPERIMENT 03 · Central tendency and variability')
+st.caption('STATISTICAL SUMMARY · Central tendency and variability')
 cols = st.multiselect('Measurements', measurement_columns(df), default=['URDACT','LBXWBCSI','LBXRBCSI','LBXHGB','LBXMCVSI','LBXPLTSI'])
 if not cols:
     st.info('Select at least one measurement.')

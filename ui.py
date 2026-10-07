@@ -35,5 +35,5 @@ def csv_button(df, name, key):
 
 
 def explain(text):
-    with st.expander('How to interpret this view'):
+    with st.expander('Analysis notes'):
         st.markdown(text)

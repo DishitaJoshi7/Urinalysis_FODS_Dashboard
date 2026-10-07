@@ -6,7 +6,7 @@ from charts import scatter, canvas, sns
 from ui import context, plot, table, explain
 
 df,labels=context()
-st.caption('EXPERIMENT 04 · Manual Pearson correlation')
+st.caption('RELATIONSHIP ANALYSIS · Pearson correlation')
 cols=measurement_columns(df)
 a,b=st.columns(2)
 with a:
@@ -21,13 +21,13 @@ with st.container(horizontal=True):
 plot(scatter(df,x,y,labels),'Relationship between selected measurements','selected_correlation')
 st.latex(r'r=\frac{\sum_i(x_i-\bar{x})(y_i-\bar{y})}{\sqrt{\sum_i(x_i-\bar{x})^2\sum_i(y_i-\bar{y})^2}}')
 
-with st.expander('Positive, negative, and weak-correlation examples from Experiment 4',expanded=True):
+with st.expander('Selected measurement relationships',expanded=True):
     for x,y,heading in [('LBXHGB','LBXHCT','Hemoglobin and hematocrit'),
                          ('LBXLYPCT','LBXNEPCT','Lymphocyte and neutrophil percentages'),
                          ('LBDEONO','LBXMCHSI','Eosinophil number and mean cell hemoglobin')]:
         st.markdown('**'+heading+'**')
         plot(scatter(df,x,y,labels),heading,'example_'+x)
-    st.caption('The third pair is the lab’s weak-correlation example; the actual coefficient is shown rather than assumed to be zero. '
+    st.caption('The third pair has a weak linear association; its measured coefficient is reported. '
                'Differential percentages share a total, which contributes to their inverse relationship.')
 
 st.subheader('Seaborn correlation heatmap')

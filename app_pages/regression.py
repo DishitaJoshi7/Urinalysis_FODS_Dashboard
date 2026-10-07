@@ -7,7 +7,7 @@ from charts import canvas, TEAL, CORAL, sns
 from ui import context, plot, table, csv_button, explain
 
 df,labels=context()
-st.caption('EXPERIMENT 05 · Predict missing hematocrit using regression')
+st.caption('MODEL EVALUATION · Hematocrit regression')
 st.markdown('Estimate **hematocrit (%)** from related CBC measurements. Compare against a training-mean baseline on unseen rows.')
 mode=st.segmented_control('Regression model',['Simple linear','Multiple linear'],default='Simple linear',key='regression_mode')
 features=['LBXHGB'] if mode=='Simple linear' else ['LBXHGB','LBXRBCSI','LBXMCVSI']
@@ -37,14 +37,6 @@ st.caption('MAE/RMSE are in hematocrit percentage points; MSE is in squared perc
 model=result['model']
 equation=f'Hematocrit = {model.intercept_:.4f} '+''.join(f'{c:+.4f} × {f} ' for f,c in zip(features,model.coef_))
 st.code(equation,language=None)
-if len(features)==1:
-    train=result['train']
-    xx=train.LBXHGB.to_numpy()
-    yy=train.LBXHCT.to_numpy()
-    slope=np.sum((xx-xx.mean())*(yy-yy.mean()))/np.sum((xx-xx.mean())**2)
-    intercept=yy.mean()-slope*xx.mean()
-    st.caption(f'Manual least-squares check on the training rows: slope {slope:.4f}, intercept {intercept:.4f}.')
-
 pred=result['predictions']
 left,right=st.columns(2)
 with left,st.container(border=True):
@@ -71,7 +63,7 @@ with st.container(horizontal=True):
     st.metric('Still missing predictors',result['unfilled'],border=True)
 if result['missing'].empty:
     st.info('No genuinely missing hematocrit values have complete predictors in this cohort. '
-            'The holdout above demonstrates regression imputation by hiding known values. No artificial measurements are added.')
+            'The holdout above evaluates predictions against held-out observed values. No artificial measurements are added.')
 else:
     table(result['missing'],'Regression estimates for eligible missing targets')
     csv_button(result['missing'],'Download labeled estimates','hematocrit_estimates')

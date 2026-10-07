@@ -5,7 +5,7 @@ from charts import distribution, missingness
 from ui import context, plot, table
 
 df, labels = context()
-st.markdown('Explore urine chemistry and blood-count measurements, then follow the full data science workflow.')
+st.markdown('Explore urine chemistry and blood-count measurements, evaluate their statistical relationships.')
 with st.container(horizontal=True):
     st.metric('Respondents', f'{len(df):,}', border=True)
     st.metric('Urine ACR observed', f'{df.URDACT.notna().sum():,}', border=True)
@@ -29,7 +29,7 @@ with st.container(border=True):
         'The supplied workbook contains urine chemistry and CBC results. RGB pad readings, strip images, '
         'calibration pairs, and repeat-visit timestamps are unavailable.')
     st.caption('Blood leukocyte counts are not urinary leukocyte-pad results. Urine albumin is not a direct calibration of a total-protein strip pad. '
-               'This coursework app does not provide diagnoses or validated strip-reader predictions.')
+               'This dashboard does not provide diagnoses or validated strip-reader predictions.')
 
 st.subheader('Measurement snapshot')
 cols = ['URXUMA','URXUCR','URDACT','LBXWBCSI','LBXHGB','LBXHCT']

@@ -33,7 +33,7 @@ If `py` is unavailable but Python is installed, replace `py -3.12` with your Pyt
 | Scale & discretize | Min-max, z-score, decimal scaling, K-means, width/quantile bins, elbow curve |
 | Visualization gallery | Line, bar, scatter, pie, box, histogram; violin, ECDF and sampled pair plot |
 | RapidMiner & Weka | Downloadable train/test CSV + ARFF, Python benchmark and tool instructions |
-| Use case & lab guide | Experiment coverage, data limitations, source links and viva walkthrough |
+| Project methodology | Study scope, analysis methods, data limitations and source links |
 
 Use the sidebar to change the cohort. Page-specific exploration filters only affect that page. Charts offer PNG downloads, and analysis tables offer CSV exports. There are no invented demographics, patient timelines, diagnoses, or RGB readings.
 
@@ -49,7 +49,7 @@ data/NHANES_2017_2018.xlsx   Unmodified copy of your workbook
 prepare_exports.py          Regenerates tool data and benchmark
 exports/                    CSV, ARFF, actual Python results and benchmark.json
 tools/                      RapidMiner process and Weka command script
-docs/                       Methodology, tool guide, presentation guide and test results
+docs/                       Methodology, tool guide and test results
 tests/                      Calculation and dashboard-interaction checks
 .vscode/                    F5 launch and export-generation task
 .streamlit/config.toml      Local theme and server settings
@@ -75,4 +75,4 @@ Model seed: 42. Default split: 80% training, 20% testing. Regression target: `LB
 
 The PDF describes a ten-pad colorimetric reader. The workbook has clinical laboratory measurements, not RGB-to-concentration calibration pairs. This app is an educational analysis of those measurements, with the reader's future data requirements explained. It does not implement the hardware or provide clinical diagnoses. Summaries are unweighted sample descriptions; survey weights and design variables are absent.
 
-Source details, caveats, and the experiment-by-experiment mapping are in `docs/METHODOLOGY.md` and the app's lab guide.
+Source details, caveats, and the experiment-by-experiment mapping are in `docs/METHODOLOGY.md` and the app’s methodology page.

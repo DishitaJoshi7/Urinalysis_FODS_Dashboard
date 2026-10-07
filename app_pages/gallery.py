@@ -6,7 +6,7 @@ from charts import six_plots, canvas, sns, TEAL
 from ui import context, plot
 
 df,labels=context()
-st.caption('EXPERIMENT 07 · Line, bar, scatter, pie, box, histogram')
+st.caption('MEASUREMENT VISUALIZATIONS · Distributions, composition and relationships')
 choices=measurement_columns(df)
 field=st.selectbox('Distribution measurement',choices,index=choices.index('LBXHGB'))
 bins=st.slider('Histogram bins',5,60,25)

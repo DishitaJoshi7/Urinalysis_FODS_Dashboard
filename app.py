@@ -9,15 +9,15 @@ page = st.navigation({
     'Dashboard': [
         st.Page('app_pages/overview.py', title='Overview', icon=':material/dashboard:'),
         st.Page('app_pages/explorer.py', title='Data explorer', icon=':material/table_chart:')],
-    'Experiments': [
-        st.Page('app_pages/statistics.py', title='03 · Descriptive statistics', icon=':material/functions:'),
-        st.Page('app_pages/correlation.py', title='04 · Correlation', icon=':material/scatter_plot:'),
-        st.Page('app_pages/regression.py', title='05 · Regression & imputation', icon=':material/model_training:'),
-        st.Page('app_pages/transforms.py', title='06 · Scale & discretize', icon=':material/tune:'),
-        st.Page('app_pages/gallery.py', title='07 · Visualization gallery', icon=':material/bar_chart:')],
+    'Analysis': [
+        st.Page('app_pages/statistics.py', title='Descriptive statistics', icon=':material/functions:'),
+        st.Page('app_pages/correlation.py', title='Correlation', icon=':material/scatter_plot:'),
+        st.Page('app_pages/regression.py', title='Regression & imputation', icon=':material/model_training:'),
+        st.Page('app_pages/transforms.py', title='Normalization & clustering', icon=':material/tune:'),
+        st.Page('app_pages/gallery.py', title='Visualizations', icon=':material/bar_chart:')],
     'Project': [
-        st.Page('app_pages/toolkit.py', title='RapidMiner & Weka', icon=':material/build:'),
-        st.Page('app_pages/methodology.py', title='Use case & lab guide', icon=':material/menu_book:')]
+        st.Page('app_pages/toolkit.py', title='Data & model exports', icon=':material/build:'),
+        st.Page('app_pages/methodology.py', title='Project methodology', icon=':material/menu_book:')]
 })
 
 # Cache the original tables; interactive selection never modifies source records.

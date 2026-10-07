@@ -8,7 +8,7 @@ from charts import canvas, sns, PALETTE, TEAL
 from ui import context, plot, table, csv_button, explain
 
 df,labels=context()
-st.caption('EXPERIMENT 06 · Normalization and discretization')
+st.caption('FEATURE ANALYSIS · Normalization and discretization')
 options=measurement_columns(df)
 field=st.selectbox('Measurement',options,index=options.index('LBXHGB'))
 normalized,power=normalization(df[field])
