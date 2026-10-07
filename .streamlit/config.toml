@@ -1,0 +1,22 @@
+# Adapted from Streamlit's minimal theme; local fonts keep the project offline-ready.
+[theme]
+base = "light"
+primaryColor = "#14877e"
+backgroundColor = "#fcfcfa"
+secondaryBackgroundColor = "#eef3f2"
+textColor = "#243c59"
+borderColor = "#dce5e3"
+showWidgetBorder = true
+showSidebarBorder = true
+baseRadius = "10px"
+buttonRadius = "8px"
+font = "sans-serif"
+headingFontWeights = [650, 600, 600, 600, 500, 500]
+chartCategoricalColors = ["#14877e", "#243c59", "#d49a38", "#c86555"]
+[theme.sidebar]
+backgroundColor = "#edf3f2"
+secondaryBackgroundColor = "#ffffff"
+[browser]
+gatherUsageStats = false
+[server]
+address = "127.0.0.1"

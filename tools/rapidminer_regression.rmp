@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Import into RapidMiner/AI Studio. Update both Read CSV paths before running. -->
+<process version="10.3.000">
+  <context><input/><output/><macros/></context>
+  <operator activated="true" class="process" compatibility="10.3.000" expanded="true" name="Process">
+    <parameter key="random_seed" value="42"/>
+    <process expanded="true">
+      <operator activated="true" class="read_csv" compatibility="10.3.000" expanded="true" name="Read training CSV" x="45" y="34">
+        <parameter key="csv_file" value="exports/train.csv"/>
+        <parameter key="column_separators" value=","/>
+        <parameter key="first_row_as_names" value="true"/>
+        <parameter key="parse_numbers" value="true"/>
+        <parameter key="decimal_character" value="."/>
+        <list key="annotations"/><list key="data_set_meta_data_information"/>
+      </operator>
+      <operator activated="true" class="set_role" compatibility="10.3.000" expanded="true" name="Training target" x="179" y="34">
+        <parameter key="attribute_name" value="LBXHCT"/><parameter key="target_role" value="label"/><list key="set_additional_roles"/>
+      </operator>
+      <operator activated="true" class="linear_regression" compatibility="10.3.000" expanded="true" name="Linear Regression" x="313" y="34">
+        <parameter key="feature_selection" value="none"/><parameter key="ridge" value="0.0"/>
+      </operator>
+      <operator activated="true" class="read_csv" compatibility="10.3.000" expanded="true" name="Read test CSV" x="45" y="187">
+        <parameter key="csv_file" value="exports/test.csv"/><parameter key="column_separators" value=","/>
+        <parameter key="first_row_as_names" value="true"/><parameter key="parse_numbers" value="true"/>
+        <parameter key="decimal_character" value="."/><list key="annotations"/><list key="data_set_meta_data_information"/>
+      </operator>
+      <operator activated="true" class="set_role" compatibility="10.3.000" expanded="true" name="Test target" x="179" y="187">
+        <parameter key="attribute_name" value="LBXHCT"/><parameter key="target_role" value="label"/><list key="set_additional_roles"/>
+      </operator>
+      <operator activated="true" class="apply_model" compatibility="10.3.000" expanded="true" name="Apply Model" x="447" y="85"><list key="application_parameters"/></operator>
+      <operator activated="true" class="performance_regression" compatibility="10.3.000" expanded="true" name="Performance" x="581" y="85">
+        <parameter key="root_mean_squared_error" value="true"/><parameter key="absolute_error" value="true"/>
+      </operator>
+      <connect from_op="Read training CSV" from_port="output" to_op="Training target" to_port="example set input"/>
+      <connect from_op="Training target" from_port="example set output" to_op="Linear Regression" to_port="training set"/>
+      <connect from_op="Linear Regression" from_port="model" to_op="Apply Model" to_port="model"/>
+      <connect from_op="Read test CSV" from_port="output" to_op="Test target" to_port="example set input"/>
+      <connect from_op="Test target" from_port="example set output" to_op="Apply Model" to_port="unlabelled data"/>
+      <connect from_op="Apply Model" from_port="labelled data" to_op="Performance" to_port="labelled data"/>
+      <connect from_op="Performance" from_port="performance" to_port="result 1"/>
+      <connect from_op="Performance" from_port="example set" to_port="result 2"/>
+      <portSpacing port="source_input 1" spacing="0"/><portSpacing port="sink_result 1" spacing="0"/><portSpacing port="sink_result 2" spacing="0"/>
+    </process>
+  </operator>
+</process>

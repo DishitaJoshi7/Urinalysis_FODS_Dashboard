@@ -1,0 +1,11 @@
+{
+  "version": "2.0.0",
+  "tasks": [{
+    "label": "FODS: regenerate tool exports",
+    "type": "process",
+    "command": "${command:python.interpreterPath}",
+    "args": ["prepare_exports.py"],
+    "options": {"cwd": "${workspaceFolder}"},
+    "problemMatcher": []
+  }]
+}

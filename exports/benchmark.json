@@ -1,0 +1,35 @@
+{
+  "source_sha256": "8a2170f36607ec3fb926061dcc078650e9720e82abf15f9e0b0365fa0e56566f",
+  "rows": {
+    "Urine_Albumin_Creatinine": 7936,
+    "Complete_Blood_Count": 8366,
+    "Merged_Dataset": 7936
+  },
+  "columns": 29,
+  "urine_acr_observed": 7632,
+  "hemoglobin_observed": 7247,
+  "complete_rows": 7073,
+  "split_seed": 42,
+  "train_rows": 5797,
+  "test_rows": 1450,
+  "missing_hematocrit": 689,
+  "eligible_estimates": 0,
+  "python_metrics": [
+    {
+      "Model": "Linear regression",
+      "MAE": 0.7910052818141267,
+      "MSE": 0.9945047524652749,
+      "RMSE": 0.9972485911071898,
+      "R2": 0.9452689445289373
+    },
+    {
+      "Model": "Training-mean baseline",
+      "MAE": 3.352358128163795,
+      "MSE": 18.19868971685969,
+      "RMSE": 4.265992231223551,
+      "R2": -0.001537191174844521
+    }
+  ],
+  "rapidminer_execution": "Not executed; import process and run locally",
+  "weka_execution": "Not executed; use supplied ARFF train/test pair"
+}
