@@ -25,3 +25,5 @@ Validation selected the lab-plus-demographics random forest. On 1,020 held-out t
 - No urine-strip hardware, RGB calibration, hospital integration or population prevalence claims are validated by this project.
 
 Navigation update: removed the Project methodology entry and its page-test parameter; 10 pages remain. Python syntax and navigation references were checked after this change.
+
+Sidebar simplification: seven navigation entries now group all existing analyses. Changed Python files compile successfully. The dashboard interaction suite was adapted for the grouped routes, but two attempts stalled in this environment and were interrupted; the new navigation has not been confirmed through a completed runtime test. Earlier passing results above refer to the prior navigation.

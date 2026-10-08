@@ -39,18 +39,17 @@ The included `setup_and_run.cmd` also performs setup and launch. Select the `.ve
 
 ## Dashboard views
 
-| View | Result |
+| Menu item | Contents |
 |---|---|
-| Overview | Reported-status counts, urine ACR comparisons, descriptive group statistics |
-| Data explorer | Joined measurements, missingness, data dictionary and cohort/merge audits |
-| Model performance | Baselines, validation selection, test ROC/PR curves, confusion matrix, precision/recall/F1, reliability diagram |
-| Research profile score | Complete illustrative profile scored by the evaluated classifier; no diagnosis or personal data storage |
-| Descriptive statistics | Mean, median, modes, sample variance/SD, grouped frequencies, IQR and boxplots |
-| Correlation | Manual Pearson calculation, relationship plots and heatmap |
-| CBC regression | Supplementary hematocrit regression/imputation analysis; separate from the diabetes classifier |
-| Normalization & clustering | Min-max, sample z-score, decimal scaling, K-means and interval binning |
-| Visualizations | All six original plot families, plus violin, ECDF and pair plots |
-| Data & model exports | Classification CSV/ARFF files and measured Python results |
+| Dashboard | Diabetes-status counts and group comparisons |
+| View data | Records, missing values, dictionary and source audits |
+| Charts & statistics | Charts, summary statistics and relationships, selected within the page |
+| Model results | Classifier comparison, ROC/PR curves and confusion matrix |
+| Try a sample profile | Research-only scoring of an illustrative profile |
+| Advanced analysis | Scaling, clustering, binning and supplementary blood-test regression |
+| Downloads | CSV/ARFF files, model results and RapidMiner/Weka instructions |
+
+The sidebar has seven entries grouped under Explore, Diabetes analysis and More tools. All original analytical features remain available. Repeated branding was removed; filter explanations are in a collapsed “About these filters” section.
 
 Sidebar status/age filters affect descriptive views. **The models always use the same full eligible cohort and frozen splits**; filtering to one response group cannot silently change the classification evaluation. Viva coaching and programming tutorials are not displayed; code comments remain.
 

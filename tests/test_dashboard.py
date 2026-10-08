@@ -8,11 +8,26 @@ from streamlit.testing.v1 import AppTest
 APP=Path(__file__).resolve().parents[1]/'app.py'
 
 
+def open_view(at, page):
+    # Original analyses now live behind a short menu and an in-page selector.
+    groups = {'gallery': ('analysis', 'analysis_view', 'Charts'),
+              'statistics': ('analysis', 'analysis_view', 'Summary statistics'),
+              'correlation': ('analysis', 'analysis_view', 'Relationships'),
+              'transforms': ('advanced', 'advanced_view', 'Scaling & clusters'),
+              'regression': ('advanced', 'advanced_view', 'Blood-test regression')}
+    if page in groups:
+        route, key, label = groups[page]
+        at.switch_page('app_pages/' + route + '.py').run()
+        at.radio(key=key).set_value(label).run()
+    else:
+        at.switch_page('app_pages/' + page + '.py').run()
+
+
 @pytest.mark.parametrize('page',['overview','explorer','classification','profile','statistics','correlation','regression','transforms','gallery','toolkit'])
 def test_pages_render(page):
     at=AppTest.from_file(str(APP),default_timeout=90).run()
     if page!='overview':
-        at.switch_page('app_pages/'+page+'.py').run()
+        open_view(at, page)
     assert not at.exception, [e.message for e in at.exception]
 
 
@@ -21,7 +36,7 @@ def test_cohort_and_regression_change():
     at.selectbox(key='status_filter').set_value('Reported diabetes').run()
     assert not at.exception
     assert int(at.metric[0].value.replace(',',''))==836
-    at.switch_page('app_pages/regression.py').run()
+    open_view(at, 'regression')
     at.session_state['regression_mode']='Multiple linear'
     at.run()
     assert not at.exception
@@ -30,12 +45,12 @@ def test_cohort_and_regression_change():
 
 def test_binning_alternatives_and_gallery():
     at=AppTest.from_file(str(APP),default_timeout=90).run()
-    at.switch_page('app_pages/transforms.py').run()
+    open_view(at, 'transforms')
     for method in ['Equal width','Equal frequency']:
         at.session_state['discretization_method']=method
         at.run()
         assert not at.exception
-    at.switch_page('app_pages/gallery.py').run()
+    open_view(at, 'gallery')
     at.selectbox[1].set_value('ECDF').run()
     assert not at.exception
 
