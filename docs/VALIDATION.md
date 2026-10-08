@@ -5,7 +5,7 @@ Validated on 8 October 2026 using Python 3.12 and the pinned project dependencie
 ## Completed checks
 
 - **28 tests passed** across three runs: 5 diabetes data/model/export checks, 14 dashboard page/interaction checks, and 9 original laboratory calculation checks.
-- All 11 dashboard pages completed under Streamlit AppTest without application exceptions. Interactions covered status filtering, alternative binning, ECDF selection, multiple CBC regression, profile submission, and unchanged model evaluation when descriptive filters change.
+- Before the methodology page was removed from navigation, all 11 dashboard pages completed under Streamlit AppTest without application exceptions. Interactions covered status filtering, alternative binning, ECDF selection, multiple CBC regression, profile submission, and unchanged model evaluation when descriptive filters change.
 - The latest supplied workbook's merged table exactly matches the included workbook. Original laboratory columns and missing values are preserved in the enriched join.
 - Source table: 7,936 respondents. Eligible adult cohort: 5,098, comprising 836 reported-diabetes responses and 4,262 no-diagnosis responses. Borderline and unavailable responses are excluded.
 - Stratified train/validation/test membership has no overlapping respondent IDs. Imputer statistics are derived only from training observations. Model selection and threshold selection use validation data.
@@ -23,3 +23,5 @@ Validation selected the lab-plus-demographics random forest. On 1,020 held-out t
 - Tests emitted third-party Seaborn/Matplotlib deprecation warnings; these did not cause failures.
 - No external or prospective model validation was performed. The target is self-reported doctor-told diabetes status; the model is not a diagnosis, future-risk forecast, or validated personal probability.
 - No urine-strip hardware, RGB calibration, hospital integration or population prevalence claims are validated by this project.
+
+Navigation update: removed the Project methodology entry and its page-test parameter; 10 pages remain. Python syntax and navigation references were checked after this change.

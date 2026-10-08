@@ -8,7 +8,7 @@ from streamlit.testing.v1 import AppTest
 APP=Path(__file__).resolve().parents[1]/'app.py'
 
 
-@pytest.mark.parametrize('page',['overview','explorer','classification','profile','statistics','correlation','regression','transforms','gallery','toolkit','methodology'])
+@pytest.mark.parametrize('page',['overview','explorer','classification','profile','statistics','correlation','regression','transforms','gallery','toolkit'])
 def test_pages_render(page):
     at=AppTest.from_file(str(APP),default_timeout=90).run()
     if page!='overview':

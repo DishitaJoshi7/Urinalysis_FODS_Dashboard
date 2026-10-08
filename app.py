@@ -19,8 +19,7 @@ page = st.navigation({
         st.Page('app_pages/transforms.py', title='Normalization & clustering', icon=':material/tune:'),
         st.Page('app_pages/gallery.py', title='Visualizations', icon=':material/bar_chart:')],
     'Project': [
-        st.Page('app_pages/toolkit.py', title='Data & model exports', icon=':material/build:'),
-        st.Page('app_pages/methodology.py', title='Project methodology', icon=':material/menu_book:')]
+        st.Page('app_pages/toolkit.py', title='Data & model exports', icon=':material/build:')]
 })
 
 # Cache the original tables; interactive selection never modifies source records.

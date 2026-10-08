@@ -51,7 +51,6 @@ The included `setup_and_run.cmd` also performs setup and launch. Select the `.ve
 | Normalization & clustering | Min-max, sample z-score, decimal scaling, K-means and interval binning |
 | Visualizations | All six original plot families, plus violin, ECDF and pair plots |
 | Data & model exports | Classification CSV/ARFF files and measured Python results |
-| Project methodology | Outcome definition, data provenance, analysis design and limitations |
 
 Sidebar status/age filters affect descriptive views. **The models always use the same full eligible cohort and frozen splits**; filtering to one response group cannot silently change the classification evaluation. Viva coaching and programming tutorials are not displayed; code comments remain.
 
@@ -114,6 +113,6 @@ The original PDF describes a urine-strip colorimetry device. This project now st
 
 ## Project status
 
-Last updated: **8 October 2026**. The diabetes data, analysis views, classification pipelines and CSV/ARFF exports are implemented. See `docs/VALIDATION.md` for checks actually completed. RapidMiner/Weka native execution remains pending. The README is maintained alongside subsequent project changes.
+Last updated: **8 October 2026**. The Project methodology page has been removed from dashboard navigation. The diabetes data, analysis views, classification pipelines and CSV/ARFF exports are implemented. See `docs/VALIDATION.md` for checks actually completed. RapidMiner/Weka native execution remains pending. The README is maintained alongside subsequent project changes.
 
 To update an already-connected GitHub repository, review the changed/new files in Source Control, stage, commit, then push/sync. Local edits do not automatically update GitHub.
